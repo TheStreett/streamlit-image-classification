@@ -5,6 +5,7 @@ from matplotlib import pyplot
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
+import ast
 import json
 import base64
 import logging
@@ -123,9 +124,10 @@ if uploaded_file is not None:
     headers = {"Content-Type": "application/json", "authorizationToken": params['token'][0]}
 
     prediction = requests.request("POST", api_url, headers = headers, data=data)
-    logging.info(prediction.text.encode("utf-8"))
+    label = ast.literal_eval(prediction.text.encode("utf-8"))
+    logging.info(label)
 
-    st.image(uploaded_file, caption="Label: {}".format(prediction.text[0].encode("utf-8")), use_column_width=True)
+    st.image(uploaded_file, caption="Label: {}".format(label[0]), use_column_width=True)
 
     # image = Image.open(uploaded_file)   
     # #st.write(os.listdir())
