@@ -3,9 +3,12 @@ from numpy import load
 from numpy import expand_dims
 from matplotlib import pyplot
 from PIL import Image, ImageDraw, ImageFont
-import logging
 import numpy as np
 import os
+import json
+import base64
+import logging
+import requests
 
 params = st.experimental_get_query_params()
 logging.info(params)
@@ -109,10 +112,20 @@ def imgGen2(img1):
 
 if uploaded_file is not None:
     #src_image = load_image(uploaded_file)
-    image = Image.open(uploaded_file)	
-	
-    st.image(uploaded_file, caption='Input Image', use_column_width=True)
-    #st.write(os.listdir())
-    im = imgGen2(uploaded_file)	
-    st.image(im, caption='ASCII art', use_column_width=True) 	
+    with open("image_name.jpg", "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read())
+        data = json.dumps({"data": encoded_string.decode('utf-8') })
+
+        api_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com/prod/m"
+        headers = {"Content-Type": "application/json", "authorizationToken": params['token']}
+
+        prediction = requests.request("POST", api_url, headers = headers, data=data)
+        print(prediction.text.encode("utf-8"))
     
+        st.image(uploaded_file, caption=prediction.text.encode("utf-8"), use_column_width=True)
+    
+    # image = Image.open(uploaded_file)   
+    # #st.write(os.listdir())
+    # im = imgGen2(uploaded_file)	
+    # st.image(im, caption=prediction.text.encode("utf-8"), use_column_width=True) 	
+

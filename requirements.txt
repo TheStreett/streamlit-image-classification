@@ -1,3 +1,5 @@
+base64
+requests
 pillow
 numpy
 matplotlib
