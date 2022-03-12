@@ -123,9 +123,9 @@ if uploaded_file is not None:
     headers = {"Content-Type": "application/json", "authorizationToken": params['token'][0]}
 
     prediction = requests.request("POST", api_url, headers = headers, data=data)
-    print(prediction.text.encode("utf-8"))
+    logging.info(prediction.text.encode("utf-8"))
 
-    st.image(uploaded_file, caption=prediction.text.encode("utf-8"), use_column_width=True)
+    st.image(uploaded_file, caption="Label: {}".format(prediction.text[0].encode("utf-8")), use_column_width=True)
 
     # image = Image.open(uploaded_file)   
     # #st.write(os.listdir())
