@@ -3,11 +3,12 @@ from numpy import load
 from numpy import expand_dims
 from matplotlib import pyplot
 from PIL import Image, ImageDraw, ImageFont
+import logging
 import numpy as np
 import os
 
 params = st.experimental_get_query_params()
-logging.info(f"{params=}")
+logging.info(params)
 
 st.header("Generate ASCII images using GAN")
 st.write("Choose any image and get corresponding ASCII art:")
