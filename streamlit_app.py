@@ -112,7 +112,7 @@ def imgGen2(img1):
 
 if uploaded_file is not None:
     #src_image = load_image(uploaded_file)
-    with open("image_name.jpg", "rb") as image_file:
+    with open(uploaded_file, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read())
         data = json.dumps({"data": encoded_string.decode('utf-8') })
 
