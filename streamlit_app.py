@@ -9,6 +9,7 @@ import json
 import base64
 import logging
 import requests
+from io import BytesIO
 
 params = st.experimental_get_query_params()
 logging.info(params)
@@ -112,18 +113,20 @@ def imgGen2(img1):
 
 if uploaded_file is not None:
     #src_image = load_image(uploaded_file)
-    with open(uploaded_file, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read())
-        data = json.dumps({"data": encoded_string.decode('utf-8') })
+    image = Image.open(uploaded_file)
+    buffered = BytesIO()
+    image.save(buffered, format="JPEG")
+    encoded_string = base64.b64encode(buffered.getvalue())
+    data = json.dumps({"data": encoded_string.decode('utf-8') })
 
-        api_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com/prod/m"
-        headers = {"Content-Type": "application/json", "authorizationToken": params['token']}
+    api_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com/prod/m"
+    headers = {"Content-Type": "application/json", "authorizationToken": params['token']}
 
-        prediction = requests.request("POST", api_url, headers = headers, data=data)
-        print(prediction.text.encode("utf-8"))
-    
-        st.image(uploaded_file, caption=prediction.text.encode("utf-8"), use_column_width=True)
-    
+    prediction = requests.request("POST", api_url, headers = headers, data=data)
+    print(prediction.text.encode("utf-8"))
+
+    st.image(uploaded_file, caption=prediction.text.encode("utf-8"), use_column_width=True)
+
     # image = Image.open(uploaded_file)   
     # #st.write(os.listdir())
     # im = imgGen2(uploaded_file)	
