@@ -120,7 +120,7 @@ if uploaded_file is not None:
     data = json.dumps({"data": encoded_string.decode('utf-8') })
 
     api_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com/prod/m"
-    headers = {"Content-Type": "application/json", "authorizationToken": params['token']}
+    headers = {"Content-Type": "application/json", "authorizationToken": params['token'][0]}
 
     prediction = requests.request("POST", api_url, headers = headers, data=data)
     print(prediction.text.encode("utf-8"))
