@@ -15,8 +15,8 @@ from io import BytesIO
 params = st.experimental_get_query_params()
 logging.info(params)
 
-st.header("Generate ASCII images using GAN")
-st.write("Choose any image and get corresponding ASCII art:")
+st.header("Image Flower Classification")
+st.write("Choose any image and get the prediction:")
 
 uploaded_file = st.file_uploader("Choose an image...")
 
