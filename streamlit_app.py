@@ -6,6 +6,9 @@ from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
 
+params = st.experimental_get_query_params()
+logging.info(f"{params=}")
+
 st.header("Generate ASCII images using GAN")
 st.write("Choose any image and get corresponding ASCII art:")
 
