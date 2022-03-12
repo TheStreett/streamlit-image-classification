@@ -15,7 +15,7 @@ from io import BytesIO
 params = st.experimental_get_query_params()
 logging.info(params)
 
-st.header("Image Flower Classification")
+st.header("Flower Image Classification")
 st.write("Choose any image and get the prediction:")
 
 uploaded_file = st.file_uploader("Choose an image...")
