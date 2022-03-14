@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit_authenticator as stauth
 from numpy import load
 from numpy import expand_dims
 from matplotlib import pyplot
@@ -12,125 +13,60 @@ import logging
 import requests
 from io import BytesIO
 
-params = st.experimental_get_query_params()
-logging.info(params)
+names = ['John Smith', 'Rebecca Briggs']
+usernames = ['jsmith', 'rbriggs']
+passwords = ['123', '456']
+hashed_passwords = stauth.hasher(passwords).generate()
+authenticator = stauth.authenticate(names, usernames, hashed_passwords,
+                                    'some_cookie_name', 'some_signature_key',
+                                    cookie_expiry_days=30)
+name, authentication_status = authenticator.login('Login','main')
+if authentication_status:
+    st.write('Welcome *%s*' % (name))
+    st.title('Some content')
+elif authentication_status == False:
+    st.error('Username/password is incorrect')
+elif authentication_status == None:
+    st.warning('Please enter your username and password')
 
-st.header("Flower Image Classification")
-st.write("Choose any image and get the prediction:")
+if st.session_state['authentication_status']:
+    st.write('Welcome *%s*' % (st.session_state['name']))
+    st.title('Some content')
+elif st.session_state['authentication_status'] == False:
+    st.error('Username/password is incorrect')
+elif st.session_state['authentication_status'] == None:
+    st.warning('Please enter your username and password')
 
-uploaded_file = st.file_uploader("Choose an image...")
+if st.session_state['authentication_status']:
+    params = st.experimental_get_query_params()
+    logging.info(params)
 
-def asciiart(in_f, SC, GCF,  out_f, color1='black', color2='blue', bgcolor='white'):
+    st.header("Flower Image Classification")
+    st.write("Choose any image and get the prediction:")
 
-    # The array of ascii symbols from white to black
-    chars = np.asarray(list(' .,:irs?@9B&#'))
+    uploaded_file = st.file_uploader("Choose an image...")
 
-    # Load the fonts and then get the the height and width of a typical symbol 
-    # You can use different fonts here
-    font = ImageFont.load_default()
-    letter_width = font.getsize("x")[0]
-    letter_height = font.getsize("x")[1]
+    if uploaded_file is not None:
+        #src_image = load_image(uploaded_file)
+        image = Image.open(uploaded_file)
+        buffered = BytesIO()
+        image.save(buffered, format="JPEG")
+        encoded_string = base64.b64encode(buffered.getvalue())
+        data = json.dumps({"data": encoded_string.decode('utf-8') })
 
-    WCF = letter_height/letter_width
+        api_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com/prod/m"
+        headers = {"Content-Type": "application/json", "authorizationToken": params['token'][0]}
 
-    #open the input file
-    img = Image.open(in_f)
+        prediction = requests.request("POST", api_url, headers = headers, data=data)
+        label = ast.literal_eval(prediction.text)
+        logging.info(label)
 
+        st.image(uploaded_file, caption="Label: {}".format(label[0]), use_column_width=True)
 
-    #Based on the desired output image size, calculate how many ascii letters are needed on the width and height
-    widthByLetter=round(img.size[0]*SC*WCF)
-    heightByLetter = round(img.size[1]*SC)
-    S = (widthByLetter, heightByLetter)
-
-    #Resize the image based on the symbol width and height
-    img = img.resize(S)
-    
-    #Get the RGB color values of each sampled pixel point and convert them to graycolor using the average method.
-    # Refer to https://www.johndcook.com/blog/2009/08/24/algorithms-convert-color-grayscale/ to know about the algorithm
-    img = np.sum(np.asarray(img), axis=2)
-    
-    # Normalize the results, enhance and reduce the brightness contrast. 
-    # Map grayscale values to bins of symbols
-    img -= img.min()
-    img = (1.0 - img/img.max())**GCF*(chars.size-1)
-    
-    # Generate the ascii art symbols 
-    lines = ("\n".join( ("".join(r) for r in chars[img.astype(int)]) )).split("\n")
-
-    # Create gradient color bins
-    nbins = len(lines)
-    #colorRange =list(Color(color1).range_to(Color(color2), nbins))
-
-    #Create an image object, set its width and height
-    newImg_width= letter_width *widthByLetter
-    newImg_height = letter_height * heightByLetter
-    newImg = Image.new("RGBA", (newImg_width, newImg_height), bgcolor)
-    draw = ImageDraw.Draw(newImg)
-
-    # Print symbols to image
-    leftpadding=0
-    y = 0
-    lineIdx=0
-    for line in lines:
-        color = 'blue'
-        lineIdx +=1
-
-        draw.text((leftpadding, y), line, '#0000FF', font=font)
-        y += letter_height
-
-    # Save the image file
-
-    #out_f = out_f.resize((1280,720))
-    newImg.save(out_f)
+        # image = Image.open(uploaded_file)   
+        # #st.write(os.listdir())
+        # im = imgGen2(uploaded_file)   
+        # st.image(im, caption=prediction.text.encode("utf-8"), use_column_width=True)  
 
 
-def load_image(filename, size=(512,512)):
-	# load image with the preferred size
-	pixels = load_img(filename, target_size=size)
-	# convert to numpy array
-	pixels = img_to_array(pixels)
-	# scale from [0,255] to [-1,1]
-	pixels = (pixels - 127.5) / 127.5
-	# reshape to 1 sample
-	pixels = expand_dims(pixels, 0)
-	return pixels
-
-
-def imgGen2(img1):
-  inputf = img1  # Input image file name
-
-  SC = 0.1    # pixel sampling rate in width
-  GCF= 2      # contrast adjustment
-
-  asciiart(inputf, SC, GCF, "results.png")   #default color, black to blue
-  asciiart(inputf, SC, GCF, "results_pink.png","blue","pink")
-  img = Image.open(img1)
-  img2 = Image.open('results.png').resize(img.size)
-  #img2.save('result.png')
-  #img3 = Image.open('results_pink.png').resize(img.size)
-  #img3.save('resultp.png')
-  return img2	
-
-
-if uploaded_file is not None:
-    #src_image = load_image(uploaded_file)
-    image = Image.open(uploaded_file)
-    buffered = BytesIO()
-    image.save(buffered, format="JPEG")
-    encoded_string = base64.b64encode(buffered.getvalue())
-    data = json.dumps({"data": encoded_string.decode('utf-8') })
-
-    api_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com/prod/m"
-    headers = {"Content-Type": "application/json", "authorizationToken": params['token'][0]}
-
-    prediction = requests.request("POST", api_url, headers = headers, data=data)
-    label = ast.literal_eval(prediction.text)
-    logging.info(label)
-
-    st.image(uploaded_file, caption="Label: {}".format(label[0]), use_column_width=True)
-
-    # image = Image.open(uploaded_file)   
-    # #st.write(os.listdir())
-    # im = imgGen2(uploaded_file)	
-    # st.image(im, caption=prediction.text.encode("utf-8"), use_column_width=True) 	
 
