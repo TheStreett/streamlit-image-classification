@@ -23,18 +23,9 @@ authenticator = stauth.authenticate(names, usernames, hashed_passwords,
 name, authentication_status = authenticator.login('Login','main')
 if authentication_status:
     st.write('Welcome *%s*' % (name))
-    st.title('Some content')
 elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:
-    st.warning('Please enter your username and password')
-
-if st.session_state['authentication_status']:
-    st.write('Welcome *%s*' % (st.session_state['name']))
-    st.title('Some content')
-elif st.session_state['authentication_status'] == False:
-    st.error('Username/password is incorrect')
-elif st.session_state['authentication_status'] == None:
     st.warning('Please enter your username and password')
 
 if st.session_state['authentication_status']:
@@ -62,11 +53,3 @@ if st.session_state['authentication_status']:
         logging.info(label)
 
         st.image(uploaded_file, caption="Label: {}".format(label[0]), use_column_width=True)
-
-        # image = Image.open(uploaded_file)   
-        # #st.write(os.listdir())
-        # im = imgGen2(uploaded_file)   
-        # st.image(im, caption=prediction.text.encode("utf-8"), use_column_width=True)  
-
-
-
