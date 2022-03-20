@@ -1,55 +1,139 @@
-import streamlit as st
-import streamlit_authenticator as stauth
-from numpy import load
-from numpy import expand_dims
-from matplotlib import pyplot
-from PIL import Image, ImageDraw, ImageFont
-import numpy as np
-import os
 import ast
 import json
 import base64
 import logging
-import requests
 from io import BytesIO
+from collections import Counter
 
-names = ['John Smith', 'Rebecca Briggs']
-usernames = ['jsmith', 'rbriggs']
-passwords = ['123', '456']
-hashed_passwords = stauth.hasher(passwords).generate()
-authenticator = stauth.authenticate(names, usernames, hashed_passwords,
-                                    'some_cookie_name', 'some_signature_key',
-                                    cookie_expiry_days=30)
-name, authentication_status = authenticator.login('Login','main')
-if authentication_status:
-    st.write('Welcome *%s*' % (name))
-elif authentication_status == False:
-    st.error('Username/password is incorrect')
-elif authentication_status == None:
-    st.warning('Please enter your username and password')
+import requests
+from PIL import Image
+import streamlit as st
+import matplotlib.pyplot as plt
 
-if st.session_state['authentication_status']:
-    params = st.experimental_get_query_params()
-    logging.info(params)
 
-    st.header("Flower Image Classification")
-    st.write("Choose any image and get the prediction:")
+def download_sample_data(api_url, token):
+    # Set the path for eval API
+    eval_url = api_url + "/prod/eval"
+    
+    # Set the authorization based on query parameter 'token', 
+    # it is obtainable once you logged in to the modelshare website
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded", 
+        "authorizationToken": token,
+    }
 
-    uploaded_file = st.file_uploader("Choose an image...")
+    # Set the body indicating we want to get sample data from eval API
+    data = {
+        "exampledata": "TRUE"
+    }
 
-    if uploaded_file is not None:
-        #src_image = load_image(uploaded_file)
-        image = Image.open(uploaded_file)
-        buffered = BytesIO()
-        image.save(buffered, format="JPEG")
-        encoded_string = base64.b64encode(buffered.getvalue())
-        data = json.dumps({"data": encoded_string.decode('utf-8') })
+    # Send the request
+    sample_images = requests.request("POST", eval_url, 
+                                     headers=headers, data=data).json()
+    logging.info(sample_images["totalfiles"])
+    # sample_images["exampledata"]
 
-        api_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com/prod/m"
-        headers = {"Content-Type": "application/json", "authorizationToken": params['token'][0]}
+def display_result(images, labels, statuses):
+    col1, col2 = st.columns(2)
 
-        prediction = requests.request("POST", api_url, headers = headers, data=data)
-        label = ast.literal_eval(prediction.text)
-        logging.info(label)
+    status_label = {
+        True: "Success",
+        False: "Failed",
+    }
+    for (image, label, status) in zip(images, labels, statuses)
+        # Display the image with filename as caption
+        with col1:
+            st.image(
+                image, 
+                caption=image.name, 
+                use_column_width=True,
+            )
 
-        st.image(uploaded_file, caption="Label: {}".format(label[0]), use_column_width=True)
+        # Display prediction details
+        with col2:
+            st.write("Status: {}".format(status_label[status]))
+            st.write("Label: {}".format(label))
+
+def display_pie_chart(sizes, labels):
+    fig, ax = plt.subplots()
+    ax.pie(sizes, labels=labels, autopct='%1.1f%%', shadow=True, startangle=90)
+    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    st.pyplot(fig)
+
+def display_bar_chart(freqs, labels):
+    fig, ax = plt.subplots()
+    ax.hist(freqs, unique_labels, density=True, histtype='bar')
+    st.pyplot(fig)
+
+def display_stats(labels):
+    # Pie chart, where the slices will be ordered and plotted counter-clockwise:
+    unique_labels = list(set(labels))
+    freqs = Counter(labels).values()
+    sizes = [float(x) / sum(freqs) * 100 for x in freqs]
+
+    display_pie_chart(sizes, labels)
+    display_bar_chart(freqs, labels)
+
+# Set the API url accordingly based on AIModelShare Playground API.
+api_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com"
+
+# Get the query parameter
+params = st.experimental_get_query_params()
+token = params['token'][0]
+
+st.header("Flower Image Classification")
+st.write("Choose any image and get the prediction:")
+
+uploaded_files = st.file_uploader(
+    label="Choose an image...",
+    type=["png", "jpg", "jpeg"],
+    accept_multiple_files=True,
+)
+
+st.button('Download sample data', on_click=download_sample_data, 
+          args=(api_url, token))
+    
+if uploaded_files:
+    labels = []
+    statuses = []
+    for i, uploaded_file in enumerate(uploaded_files):
+        try:
+            # Prepare the uploaded image into base64 encoded string
+            image = Image.open(uploaded_file)
+            buffered = BytesIO()
+            image.save(buffered, format="JPEG")
+            encoded_string = base64.b64encode(buffered.getvalue())
+            data = json.dumps({"data": encoded_string.decode('utf-8') })
+
+            # Set the path for prediction API
+            pred_url = api_url + "/prod/m"
+            
+            # Set the authorization based on query parameter 'token', 
+            # it is obtainable once you logged in to the modelshare website
+            headers = {
+                "Content-Type": "application/json", 
+                "authorizationToken": token,
+            }
+
+            # Send the request
+            prediction = requests.request("POST", pred_url, 
+                                          headers=headers, data=data)
+
+            # Parse the prediction
+            label = ast.literal_eval(prediction.text)
+            
+            # Insert the label into labels
+            labels.append(label)
+            
+            # Insert the API call status into statuses
+            statuses.append(True)
+        except Exception as e:
+            logging.info(e)
+
+            # add label as None if necessary
+            if len(labels) < i + 1:
+                labels.append(None)
+            statuses.append(False)
+
+    display_result(uploaded_files, labels, statuses)
+    display_stats(labels)
