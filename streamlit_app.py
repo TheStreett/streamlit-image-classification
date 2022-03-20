@@ -97,8 +97,8 @@ uploaded_files = st.file_uploader(
     accept_multiple_files=True,
 )
 
-st.button('Download sample data', on_click=download_sample_data, 
-          args=(api_url, token))
+if st.button('Download sample data'):
+    download_sample_data(api_url, token)
     
 labels = []
 statuses = []
