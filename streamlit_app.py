@@ -98,6 +98,7 @@ uploaded_files = st.file_uploader(
 )
 
 if st.button('Download sample data'):
+    print("Downloading data")
     download_sample_data(api_url, token)
     
 labels = []
