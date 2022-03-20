@@ -29,8 +29,10 @@ def download_sample_data(api_url, token):
     data = json.dumps(data)
 
     # Send the request
+    logging.info("sending request")
     sample_images = requests.request("POST", eval_url, 
                                      headers=headers, data=data).json()
+    logging.info("request done")
     logging.info(sample_images)
     # sample_images["totalfiles"]
     # sample_images["exampledata"]
