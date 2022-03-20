@@ -30,7 +30,8 @@ def download_sample_data(api_url, token):
     # Send the request
     sample_images = requests.request("POST", eval_url, 
                                      headers=headers, data=data).json()
-    logging.info(sample_images["totalfiles"])
+    logging.info(sample_images)
+    # sample_images["totalfiles"]
     # sample_images["exampledata"]
 
 def display_result(images, labels, statuses):
