@@ -105,7 +105,13 @@ def main():
 
     # Get the query parameter
     params = st.experimental_get_query_params()
-    token = params['token'][0]
+    if "token" not in params:
+        st.warning("Please insert the auth token as query parameter. " 
+                   "e.g. https://share.streamlit.io/raudipra/"
+                   "streamlit-image-classification/main?token=secret")
+        token = ""
+    else:
+        token = params['token'][0]
 
     st.header("Flower Image Classification")
 

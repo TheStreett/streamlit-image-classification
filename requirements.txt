@@ -4,5 +4,4 @@ numpy
 matplotlib
 colour
 plotly
-loguru
 streamlit
