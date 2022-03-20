@@ -58,7 +58,7 @@ def download_data_sample(api_url, token):
             image_buffer = BytesIO()
             with image_buffer as ib:
                 ib.write(base64.b64decode(image))
-            zip_file.writestr(file_name, ib.getvalue())
+            zip_file.writestr(file_name, image_buffer.getvalue())
     
     btn = st.download_button(
         label="Download data sample",
