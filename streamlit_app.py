@@ -35,25 +35,26 @@ def download_sample_data(api_url, token):
     # sample_images["exampledata"]
 
 def display_result(images, labels, statuses):
-    col1, col2 = st.columns(2)
-
     status_label = {
         True: "Success",
         False: "Failed",
     }
     for (image, label, status) in zip(images, labels, statuses):
         # Display the image with filename as caption
-        with col1:
-            st.image(
-                image, 
-                caption=image.name, 
-                use_column_width=True,
-            )
+        with st.container():
+            col1, col2 = st.columns(2)
 
-        # Display prediction details
-        with col2:
-            st.write("Status: {}".format(status_label[status]))
-            st.write("Label: {}".format(label))
+            with col1:
+                st.image(
+                    image, 
+                    caption=image.name, 
+                    use_column_width=True,
+                )
+
+            # Display prediction details
+            with col2:
+                st.write("Status: {}".format(status_label[status]))
+                st.write("Label: {}".format(label))
 
 def display_pie_chart(sizes, labels):
     fig, ax = plt.subplots()
@@ -69,7 +70,7 @@ def display_bar_chart(freqs, labels):
 def display_stats(labels):
     # Pie chart, where the slices will be ordered and plotted counter-clockwise:
     logging.info(labels)
-    unique_labels = set(labels)
+    unique_labels = list(set(labels))
     logging.info(unique_labels)
     freqs = Counter(labels).values()
     logging.info(freqs)
@@ -124,7 +125,7 @@ if uploaded_files:
                                           headers=headers, data=data)
 
             # Parse the prediction
-            label = ast.literal_eval(prediction.text)
+            label = ast.literal_eval(prediction.text)[0]
             
             # Insert the label into labels
             labels.append(label)
