@@ -18,7 +18,7 @@ def download_sample_data(api_url, token):
     # Set the authorization based on query parameter 'token', 
     # it is obtainable once you logged in to the modelshare website
     headers = {
-        "Content-Type": "application/x-www-form-urlencoded", 
+        "Content-Type": "application/json", 
         "authorizationToken": token,
     }
 
@@ -26,6 +26,7 @@ def download_sample_data(api_url, token):
     data = {
         "exampledata": "TRUE"
     }
+    data = json.dumps(data)
 
     # Send the request
     sample_images = requests.request("POST", eval_url, 
