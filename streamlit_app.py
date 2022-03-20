@@ -64,6 +64,7 @@ def display_pie_chart(sizes, labels):
 
 def display_bar_chart(freqs, labels):
     fig, ax = plt.subplots()
+    print(labels, freqs)
     ax.hist(labels, freqs, density=True, histtype='bar')
     st.pyplot(fig)
 
