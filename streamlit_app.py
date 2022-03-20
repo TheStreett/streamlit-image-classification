@@ -1,6 +1,7 @@
 import ast
 import json
 import base64
+import zipfile
 from io import BytesIO
 from collections import Counter
 
@@ -13,6 +14,7 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
 
+# Redirect logger into streamlit output
 def redirect_loguru_to_streamlit():
     def _filter_warning(record):
         return record["level"].no == logger.level("WARNING").no    
@@ -23,7 +25,7 @@ def redirect_loguru_to_streamlit():
 
 redirect_loguru_to_streamlit()
 
-def download_sample_data(api_url, token):
+def download_data_sample(api_url, token):
     try:
         # Set the path for eval API
         eval_url = api_url + "/prod/eval"
@@ -44,9 +46,26 @@ def download_sample_data(api_url, token):
         # Send the request
         sample_images = requests.request("POST", eval_url, 
                                          headers=headers, data=data).json()
-        logger.warning(len(sample_images['exampledata'].split(",")))
-        # sample_images["totalfiles"]
-        # sample_images["exampledata"]
+
+        # Parsing the base64 encoded images
+        images = sample_images['exampledata'].split(",")
+
+        # Prepare the data sample in zip
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
+            for i, image in enumerate(images):
+                file_name = "image_sample{}.png".format(i)
+                image_buffer = BytesIO()
+                with image_buffer as ib:
+                    ib.write(base64.decodebytes(image))
+                zip_file.writestr(file_name, ib.getvalue())
+        
+        btn = st.download_button(
+            label="Download data sample",
+            data=zip_buffer.getvalue(),
+            file_name="data_sample.zip",
+            mime="application/zip"
+        )
     except Exception as e:
         logger.error(e)
 
@@ -107,8 +126,7 @@ uploaded_files = st.file_uploader(
     accept_multiple_files=True,
 )
 
-if st.button('Download sample data'):
-    download_sample_data(api_url, token)
+download_data_sample(api_url, token)
     
 labels = []
 statuses = []
