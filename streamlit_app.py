@@ -95,17 +95,19 @@ uploaded_files = st.file_uploader(
 st.button('Download sample data', on_click=download_sample_data, 
           args=(api_url, token))
     
+labels = []
+statuses = []
+images = []    
 if uploaded_files:
-    labels = []
-    statuses = []
-    for i, uploaded_file in enumerate(uploaded_files):
+    for uploaded_file in uploaded_files:
         try:
             # Prepare the uploaded image into base64 encoded string
+            images.append(uploaded_file)
             image = Image.open(uploaded_file)
             buffered = BytesIO()
             image.save(buffered, format="JPEG")
             encoded_string = base64.b64encode(buffered.getvalue())
-            data = json.dumps({"data": encoded_string.decode('utf-8') })
+            data = json.dumps({"data": encoded_string.decode('utf-8')})
 
             # Set the path for prediction API
             pred_url = api_url + "/prod/m"
@@ -133,9 +135,9 @@ if uploaded_files:
             logging.info(e)
 
             # add label as None if necessary
-            if len(labels) < i + 1:
+            if len(labels) < len(images):
                 labels.append(None)
             statuses.append(False)
 
-    display_result(uploaded_files, labels, statuses)
+    display_result(images, labels, statuses)
     display_stats(labels)
