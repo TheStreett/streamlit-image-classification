@@ -64,7 +64,7 @@ def display_pie_chart(sizes, labels):
 
 def display_bar_chart(freqs, labels):
     fig, ax = plt.subplots()
-    ax.hist(freqs, unique_labels, density=True, histtype='bar')
+    ax.hist(freqs, labels, density=True, histtype='bar')
     st.pyplot(fig)
 
 def display_stats(labels):
@@ -77,7 +77,7 @@ def display_stats(labels):
     sizes = [float(x) / sum(freqs) * 100 for x in freqs]
 
     display_pie_chart(sizes, labels)
-    display_bar_chart(freqs, labels)
+    display_bar_chart(freqs, unique_labels)
 
 # Set the API url accordingly based on AIModelShare Playground API.
 api_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com"
