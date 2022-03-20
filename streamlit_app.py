@@ -108,10 +108,9 @@ def main():
     token = params['token'][0]
 
     st.header("Flower Image Classification")
-    st.write("Choose any image and get the prediction:")
 
     uploaded_files = st.file_uploader(
-        label="Choose any image...",
+        label="Choose any and get the prediction",
         type=["png", "jpg", "jpeg"],
         accept_multiple_files=True,
     )
