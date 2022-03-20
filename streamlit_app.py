@@ -64,17 +64,13 @@ def display_pie_chart(sizes, labels):
 
 def display_bar_chart(freqs, labels):
     fig, ax = plt.subplots()
-    print(labels, freqs)
-    ax.hist(labels, freqs, density=True, histtype='bar')
+    ax.bar(labels, freqs)
     st.pyplot(fig)
 
 def display_stats(labels):
     # Pie chart, where the slices will be ordered and plotted counter-clockwise:
-    logging.info(labels)
     unique_labels = list(set(labels))
-    logging.info(unique_labels)
     freqs = list(Counter(labels).values())
-    logging.info(freqs)
     sizes = [float(x) / sum(freqs) * 100 for x in freqs]
 
     display_pie_chart(sizes, labels)
