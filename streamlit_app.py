@@ -8,6 +8,7 @@ from collections import Counter
 import requests
 from PIL import Image
 import streamlit as st
+import plotly.express as px
 import matplotlib.pyplot as plt
 
 
@@ -66,9 +67,11 @@ def display_pie_chart(sizes, labels):
     st.pyplot(fig)
 
 def display_bar_chart(freqs, labels):
-    fig, ax = plt.subplots()
-    ax.bar(labels, freqs)
-    st.pyplot(fig)
+    fig = px.bar(x=labels, y=freqs)
+    st.plotly_chart(fig, use_container_width=True)
+    # fig, ax = plt.subplots()
+    # ax.bar(labels, freqs)
+    # st.pyplot(fig)
 
 def display_stats(labels):
     # Pie chart, where the slices will be ordered and plotted counter-clockwise:
