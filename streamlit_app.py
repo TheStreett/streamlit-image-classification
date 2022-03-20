@@ -67,6 +67,7 @@ def display_pie_chart(sizes, labels):
     st.pyplot(fig)
 
 def display_bar_chart(freqs, labels):
+    logging.info("Using plotly")
     fig = px.bar(x=labels, y=freqs)
     st.plotly_chart(fig, use_container_width=True)
     # fig, ax = plt.subplots()
