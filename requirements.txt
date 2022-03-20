@@ -4,3 +4,4 @@ numpy
 matplotlib
 colour
 plotly
+loguru

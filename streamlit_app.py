@@ -1,17 +1,27 @@
 import ast
 import json
 import base64
-import logging
 from io import BytesIO
 from collections import Counter
 
 import requests
 from PIL import Image
 import streamlit as st
+from loguru import logger
 import plotly.express as px
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
+
+def redirect_loguru_to_streamlit():
+    def _filter_warning(record):
+        return record["level"].no == logger.level("WARNING").no    
+    if 'warning_logger' not in st.session_state:
+        st.session_state['warning_logger'] = logger.add(st.warning, filter=_filter_warning, level='INFO')
+    if 'error_logger' not in st.session_state:
+        st.session_state['error_logger'] = logger.add(st.error, level='ERROR')
+
+redirect_loguru_to_streamlit()
 
 def download_sample_data(api_url, token):
     try:
@@ -34,11 +44,11 @@ def download_sample_data(api_url, token):
         # Send the request
         sample_images = requests.request("POST", eval_url, 
                                          headers=headers, data=data).json()
-        logging.warning(sample_images)
+        logger.warning(sample_images)
         # sample_images["totalfiles"]
         # sample_images["exampledata"]
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
 
 def display_result(images, labels, statuses):
     status_label = {
@@ -137,7 +147,7 @@ if uploaded_files:
             # Insert the API call status into statuses
             statuses.append(True)
         except Exception as e:
-            logging.error(e)
+            logger.error(e)
 
             # add label as None if necessary
             if len(labels) < len(images):
