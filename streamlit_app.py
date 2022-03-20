@@ -10,33 +10,35 @@ from PIL import Image
 import streamlit as st
 import plotly.express as px
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 
 def download_sample_data(api_url, token):
-    # Set the path for eval API
-    eval_url = api_url + "/prod/eval"
-    
-    # Set the authorization based on query parameter 'token', 
-    # it is obtainable once you logged in to the modelshare website
-    headers = {
-        "Content-Type": "application/json", 
-        "authorizationToken": token,
-    }
+    try:
+        # Set the path for eval API
+        eval_url = api_url + "/prod/eval"
+        
+        # Set the authorization based on query parameter 'token', 
+        # it is obtainable once you logged in to the modelshare website
+        headers = {
+            "Content-Type": "application/json", 
+            "authorizationToken": token,
+        }
 
-    # Set the body indicating we want to get sample data from eval API
-    data = {
-        "exampledata": "TRUE"
-    }
-    data = json.dumps(data)
+        # Set the body indicating we want to get sample data from eval API
+        data = {
+            "exampledata": "TRUE"
+        }
+        data = json.dumps(data)
 
-    # Send the request
-    logging.info("sending request")
-    sample_images = requests.request("POST", eval_url, 
-                                     headers=headers, data=data).json()
-    logging.info("request done")
-    logging.info(sample_images)
-    # sample_images["totalfiles"]
-    # sample_images["exampledata"]
+        # Send the request
+        sample_images = requests.request("POST", eval_url, 
+                                         headers=headers, data=data).json()
+        logging.warning(sample_images)
+        # sample_images["totalfiles"]
+        # sample_images["exampledata"]
+    except Exception as e:
+        logging.error(e)
 
 def display_result(images, labels, statuses):
     status_label = {
@@ -61,19 +63,13 @@ def display_result(images, labels, statuses):
                 st.write("Label: {}".format(label))
 
 def display_pie_chart(sizes, labels):
-    fig, ax = plt.subplots()
-    ax.pie(sizes, labels=labels, autopct='%1.1f%%', shadow=True, startangle=90)
-    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    st.pyplot(fig)
-
+    fig = go.Figure(data=[go.Pie(labels=labels, values=sizes)])
+    st.plotly_chart(fig, use_container_width=True)
+    
 def display_bar_chart(freqs, labels):
-    logging.info("Using plotly")
     fig = px.bar(x=labels, y=freqs)
     st.plotly_chart(fig, use_container_width=True)
-    # fig, ax = plt.subplots()
-    # ax.bar(labels, freqs)
-    # st.pyplot(fig)
-
+    
 def display_stats(labels):
     # Pie chart, where the slices will be ordered and plotted counter-clockwise:
     counter = Counter(labels)
@@ -101,9 +97,7 @@ uploaded_files = st.file_uploader(
     accept_multiple_files=True,
 )
 
-logging.info("Downloading data 1")
 if st.button('Download sample data'):
-    logging.info("Downloading data 2")
     download_sample_data(api_url, token)
     
 labels = []
@@ -143,7 +137,7 @@ if uploaded_files:
             # Insert the API call status into statuses
             statuses.append(True)
         except Exception as e:
-            logging.info(e)
+            logging.error(e)
 
             # add label as None if necessary
             if len(labels) < len(images):
