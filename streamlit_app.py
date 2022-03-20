@@ -69,8 +69,10 @@ def display_bar_chart(freqs, labels):
 
 def display_stats(labels):
     # Pie chart, where the slices will be ordered and plotted counter-clockwise:
-    unique_labels = list(set(labels))
-    freqs = list(Counter(labels).values())
+    counter = Counter(labels)
+    unique_labels = list(counter.keys())
+    freqs = list(counter.values())
+
     sizes = [float(x) / sum(freqs) * 100 for x in freqs]
 
     display_pie_chart(sizes, unique_labels)
