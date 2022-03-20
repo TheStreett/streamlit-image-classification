@@ -40,7 +40,7 @@ def display_result(images, labels, statuses):
         True: "Success",
         False: "Failed",
     }
-    for (image, label, status) in zip(images, labels, statuses)
+    for (image, label, status) in zip(images, labels, statuses):
         # Display the image with filename as caption
         with col1:
             st.image(
