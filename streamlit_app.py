@@ -44,7 +44,7 @@ def download_sample_data(api_url, token):
         # Send the request
         sample_images = requests.request("POST", eval_url, 
                                          headers=headers, data=data).json()
-        logger.warning(sample_images.keys())
+        logger.warning(len(sample_images['exampledata'].split(",")))
         # sample_images["totalfiles"]
         # sample_images["exampledata"]
     except Exception as e:
