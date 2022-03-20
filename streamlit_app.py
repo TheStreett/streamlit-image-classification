@@ -110,7 +110,7 @@ def main():
     st.header("Flower Image Classification")
 
     uploaded_files = st.file_uploader(
-        label="Choose any and get the prediction",
+        label="Choose any image and get the prediction",
         type=["png", "jpg", "jpeg"],
         accept_multiple_files=True,
     )
