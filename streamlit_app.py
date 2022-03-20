@@ -111,6 +111,7 @@ def main():
     st.write("Choose any image and get the prediction:")
 
     uploaded_files = st.file_uploader(
+        label="Choose any image...",
         type=["png", "jpg", "jpeg"],
         accept_multiple_files=True,
     )
