@@ -72,7 +72,7 @@ def display_stats(labels):
     logging.info(labels)
     unique_labels = list(set(labels))
     logging.info(unique_labels)
-    freqs = Counter(labels).values()
+    freqs = list(Counter(labels).values())
     logging.info(freqs)
     sizes = [float(x) / sum(freqs) * 100 for x in freqs]
 
