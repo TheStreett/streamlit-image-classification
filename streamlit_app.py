@@ -73,7 +73,7 @@ def display_stats(labels):
     freqs = list(Counter(labels).values())
     sizes = [float(x) / sum(freqs) * 100 for x in freqs]
 
-    display_pie_chart(sizes, labels)
+    display_pie_chart(sizes, unique_labels)
     display_bar_chart(freqs, unique_labels)
 
 # Set the API url accordingly based on AIModelShare Playground API.
