@@ -165,6 +165,12 @@ def predict(uploaded_file, api_url, token):
     label = ast.literal_eval(prediction.text)[0]
     return label
 
+def resize_image(uploaded_file):
+    image = Image.open(uploaded_file)
+    MAX_SIZE = (100, 100)
+    image.thumbnail(MAX_SIZE)
+    return image
+
 def main():
     # Set the API url accordingly based on AIModelShare Playground API.
     api_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com"
@@ -204,8 +210,10 @@ def main():
     if uploaded_files:
         for uploaded_file in uploaded_files:
             try:
+                # Keep the resized image for prediction display
+                images.append(resize_image(uploaded_file))
+                
                 # Classify the image
-                images.append(uploaded_file)
                 label = predict(uploaded_file, api_url, token)
                 
                 # Insert the label into labels
