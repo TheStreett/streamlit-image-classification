@@ -71,8 +71,8 @@ def display_result(images, labels, statuses):
 
             with col1:
                 st.image(
-                    image, 
-                    caption=image.name, 
+                    image[0], 
+                    caption=image[1], 
                     use_column_width=True,
                 )
 
@@ -165,11 +165,12 @@ def predict(uploaded_file, api_url, token):
     label = ast.literal_eval(prediction.text)[0]
     return label
 
-def resize_image(uploaded_file):
+# Resize image and extract the image filename
+def transform_image(uploaded_file):
     image = Image.open(uploaded_file)
     MAX_SIZE = (100, 100)
     image.thumbnail(MAX_SIZE)
-    return image
+    return (image, uploaded_file.name)
 
 def main():
     # Set the API url accordingly based on AIModelShare Playground API.
@@ -210,8 +211,8 @@ def main():
     if uploaded_files:
         for uploaded_file in uploaded_files:
             try:
-                # Keep the resized image for prediction display
-                images.append(resize_image(uploaded_file))
+                # Keep the resized image and filename for prediction display
+                images.append(transform_image(uploaded_file))
                 
                 # Classify the image
                 label = predict(uploaded_file, api_url, token)
