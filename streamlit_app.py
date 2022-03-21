@@ -109,8 +109,6 @@ def display_pie_chart(sizes, labels):
     st_echarts(
         options=options, height="500px",
     )
-    # fig = go.Figure(data=[go.Pie(labels=labels, values=sizes)])
-    # st.plotly_chart(fig, use_container_width=True)
     
 def display_bar_chart(freqs, labels):
     options = {
@@ -122,8 +120,6 @@ def display_bar_chart(freqs, labels):
         "series": [{"data": freqs, "type": "bar"}],
     }
     st_echarts(options=options, height="500px")
-    # fig = px.bar(x=labels, y=freqs)
-    # st.plotly_chart(fig, use_container_width=True)
     
 def display_stats(labels):
     counter = Counter(labels)
