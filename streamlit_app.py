@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from streamlit_echarts import st_echarts
 
-
 def download_data_sample(api_url, token):
     try:
         # Set the path for eval API
@@ -206,7 +205,15 @@ def main():
                  " using modelshare's playground url")
 
         code = """
-api_url = "https://n0l8kcy3wh.execute-api.us-east-1.amazonaws.com"
+import ast
+import json
+import base64
+import requests
+from PIL import Image
+import streamlit as st
+from io import BytesIO
+
+api_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com"
 token = st.experimental_get_query_params()['token'][0]
 image = Image.open(image_file)
 def predict(image, api_url, token):
