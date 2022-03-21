@@ -65,10 +65,11 @@ def display_result(images, labels, statuses):
         False: "Failed",
     }
     for (image, label, status) in zip(images, labels, statuses):
-        # Display the image with filename as caption
+        # Display prediction details
         with st.container():
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
 
+            # Display the image with filename as caption
             with col1:
                 st.image(
                     image[0], 
@@ -76,9 +77,10 @@ def display_result(images, labels, statuses):
                     use_column_width=False,
                 )
 
-            # Display prediction details
             with col2:
                 st.write("Status: {}".format(status_label[status]))
+                
+            with col3:
                 st.write("Label: {}".format(label))
 
 def display_pie_chart(sizes, labels):
@@ -168,7 +170,7 @@ def predict(uploaded_file, api_url, token):
 # Resize image and extract the image filename
 def transform_image(uploaded_file):
     image = Image.open(uploaded_file)
-    MAX_SIZE = (100, 100)
+    MAX_SIZE = (150, 150)
     image.thumbnail(MAX_SIZE)
     return (image, uploaded_file.name)
 
