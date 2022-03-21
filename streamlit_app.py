@@ -193,6 +193,49 @@ def main():
     images = []
 
     st.header("Flower Image Classification")
+    if st.checkbox("Show instruction"):
+        st.write("To build and run modelshare's streamlit app, you will need "
+                  "authorization token and modelshare's playground URL. "
+                  "You can obtain the auth token by signing in to www.modelshare.org "
+                  "and the playground URL by choosing any of available playground in "
+                  "www.modelshare.org. Pass the auth token to the app as a query "
+                  "parameter 'token' on streamlit's URL, e.g. https://share.streamlit.io/user/"
+                  "apps-name/main?token=secret.")
+
+        st.write("Here are some important part of codes to classify an image"
+                 " using modelshare's playground url")
+
+        code = """
+api_url = "https://n0l8kcy3wh.execute-api.us-east-1.amazonaws.com"
+token = st.experimental_get_query_params()['token'][0]
+image = Image.open(image_file)
+def predict(image, api_url, token):
+    # Prepare the uploaded image into base64 encoded string
+    buffered = BytesIO()
+    image.save(buffered, format="JPEG")
+    encoded_string = base64.b64encode(buffered.getvalue())
+    data = json.dumps({"data": encoded_string.decode('utf-8')})
+
+    # Set the path for prediction API
+    pred_url = api_url + "/prod/m"
+
+    # Set the authorization based on query parameter 'token', 
+    # it is obtainable once you logged in to the modelshare website
+    headers = {
+        "Content-Type": "application/json", 
+        "authorizationToken": token,
+    }
+
+    # Send the request
+    prediction = requests.request("POST", pred_url, 
+                                  headers=headers, data=data)
+
+    # Parse the prediction
+    label = ast.literal_eval(prediction.text)[0]
+    return label
+label = predict(data, api_url, token)
+        """
+        st.code(code, "python")
 
     with st.container():
         col1, col2 = st.columns([3, 1])
