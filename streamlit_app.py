@@ -73,7 +73,7 @@ def display_result(images, labels, statuses):
                 st.image(
                     image[0], 
                     caption=image[1], 
-                    use_column_width=True,
+                    use_column_width=False,
                 )
 
             # Display prediction details
