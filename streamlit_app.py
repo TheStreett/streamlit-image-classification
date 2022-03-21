@@ -186,7 +186,7 @@ def main():
     st.header("Flower Image Classification")
 
     with st.container():
-        col1, col2 = st.columns(2)
+        col1, col2 = st.columns([3, 1])
 
         with col1:
             uploaded_files = st.file_uploader(
@@ -198,7 +198,8 @@ def main():
             download_data_sample(api_url, token)
 
         with col2:
-            st.metric(label="Request count", value=len(statuses))
+            metric_placeholder = st.empty()
+            metric_placeholder.metric(label="Request count", value=len(statuses))
     
     if uploaded_files:
         for uploaded_file in uploaded_files:
@@ -220,6 +221,7 @@ def main():
                     labels.append(None)
                 statuses.append(False)
 
+        metric_placeholder.metric(label="Request count", value=len(statuses))
         display_stats(labels)
         display_result(images, labels, statuses)
 
