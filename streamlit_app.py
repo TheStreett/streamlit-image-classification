@@ -12,6 +12,7 @@ import streamlit as st
 import plotly.express as px
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+from streamlit_echarts import st_echarts
 
 
 def download_data_sample(api_url, token):
@@ -81,12 +82,48 @@ def display_result(images, labels, statuses):
                 st.write("Label: {}".format(label))
 
 def display_pie_chart(sizes, labels):
-    fig = go.Figure(data=[go.Pie(labels=labels, values=sizes)])
-    st.plotly_chart(fig, use_container_width=True)
+    data = [{"value": sizes[i], "name": labels[i]} for i in range(len(sizes))]
+    options = {
+        "tooltip": {"trigger": "item"},
+        "legend": {"top": "5%", "left": "center"},
+        "series": [
+            {
+                "name": "Prediction Statistics",
+                "type": "pie",
+                "radius": ["20%", "70%"],
+                "avoidLabelOverlap": False,
+                "itemStyle": {
+                    "borderRadius": 10,
+                    "borderColor": "#fff",
+                    "borderWidth": 2,
+                },
+                "label": {"show": False, "position": "center"},
+                "emphasis": {
+                    "label": {"show": True, "fontSize": "40", "fontWeight": "bold"}
+                },
+                "labelLine": {"show": False},
+                "data": data,
+            }
+        ],
+    }
+    st_echarts(
+        options=options, height="500px",
+    )
+    # fig = go.Figure(data=[go.Pie(labels=labels, values=sizes)])
+    # st.plotly_chart(fig, use_container_width=True)
     
 def display_bar_chart(freqs, labels):
-    fig = px.bar(x=labels, y=freqs)
-    st.plotly_chart(fig, use_container_width=True)
+    options = {
+        "xAxis": {
+            "type": "category",
+            "data": labels,
+        },
+        "yAxis": {"type": "value"},
+        "series": [{"data": freqs, "type": "bar"}],
+    }
+    st_echarts(options=options, height="500px")
+    # fig = px.bar(x=labels, y=freqs)
+    # st.plotly_chart(fig, use_container_width=True)
     
 def display_stats(labels):
     counter = Counter(labels)
@@ -96,8 +133,42 @@ def display_stats(labels):
     # Size or portion in pie chart
     sizes = [float(x) / sum(freqs) * 100 for x in freqs]
 
-    display_pie_chart(sizes, unique_labels)
-    display_bar_chart(freqs, unique_labels)
+    with st.container():
+        col1, col2 = st.columns(2)
+
+        with col1:
+            display_pie_chart(sizes, unique_labels)
+
+        # Display prediction details
+        with col2:
+            display_bar_chart(freqs, unique_labels)
+
+def predict(uploaded_file, api_url, token):
+    # Prepare the uploaded image into base64 encoded string
+    images.append(uploaded_file)
+    image = Image.open(uploaded_file)
+    buffered = BytesIO()
+    image.save(buffered, format="JPEG")
+    encoded_string = base64.b64encode(buffered.getvalue())
+    data = json.dumps({"data": encoded_string.decode('utf-8')})
+
+    # Set the path for prediction API
+    pred_url = api_url + "/prod/m"
+
+    # Set the authorization based on query parameter 'token', 
+    # it is obtainable once you logged in to the modelshare website
+    headers = {
+        "Content-Type": "application/json", 
+        "authorizationToken": token,
+    }
+
+    # Send the request
+    prediction = requests.request("POST", pred_url, 
+                                  headers=headers, data=data)
+
+    # Parse the prediction
+    label = ast.literal_eval(prediction.text)[0]
+    return label
 
 def main():
     # Set the API url accordingly based on AIModelShare Playground API.
@@ -129,30 +200,8 @@ def main():
     if uploaded_files:
         for uploaded_file in uploaded_files:
             try:
-                # Prepare the uploaded image into base64 encoded string
-                images.append(uploaded_file)
-                image = Image.open(uploaded_file)
-                buffered = BytesIO()
-                image.save(buffered, format="JPEG")
-                encoded_string = base64.b64encode(buffered.getvalue())
-                data = json.dumps({"data": encoded_string.decode('utf-8')})
-
-                # Set the path for prediction API
-                pred_url = api_url + "/prod/m"
-                
-                # Set the authorization based on query parameter 'token', 
-                # it is obtainable once you logged in to the modelshare website
-                headers = {
-                    "Content-Type": "application/json", 
-                    "authorizationToken": token,
-                }
-
-                # Send the request
-                prediction = requests.request("POST", pred_url, 
-                                              headers=headers, data=data)
-
-                # Parse the prediction
-                label = ast.literal_eval(prediction.text)[0]
+                # Classify the image
+                label = predict(uploaded_file, api_url, token)
                 
                 # Insert the label into labels
                 labels.append(label)
