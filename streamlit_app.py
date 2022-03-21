@@ -179,19 +179,27 @@ def main():
     else:
         token = params['token'][0]
 
-    st.header("Flower Image Classification")
-
-    uploaded_files = st.file_uploader(
-        label="Choose any image and get the prediction",
-        type=["png", "jpg", "jpeg"],
-        accept_multiple_files=True,
-    )
-
-    download_data_sample(api_url, token)
-        
     labels = []
     statuses = []
-    images = []    
+    images = []
+
+    st.header("Flower Image Classification")
+
+    with st.container():
+        col1, col2 = st.columns(2)
+
+        with col1:
+            uploaded_files = st.file_uploader(
+                label="Choose any image and get the prediction",
+                type=["png", "jpg", "jpeg"],
+                accept_multiple_files=True,
+            )
+
+            download_data_sample(api_url, token)
+
+        with col2:
+            st.metric(label="Request count", value=len(statuses))
+    
     if uploaded_files:
         for uploaded_file in uploaded_files:
             try:
