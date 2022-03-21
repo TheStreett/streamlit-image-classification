@@ -133,19 +133,18 @@ def display_stats(labels):
     # Size or portion in pie chart
     sizes = [float(x) / sum(freqs) * 100 for x in freqs]
 
+    # Display prediction details
     with st.container():
         col1, col2 = st.columns(2)
 
         with col1:
             display_pie_chart(sizes, unique_labels)
 
-        # Display prediction details
         with col2:
             display_bar_chart(freqs, unique_labels)
 
 def predict(uploaded_file, api_url, token):
     # Prepare the uploaded image into base64 encoded string
-    images.append(uploaded_file)
     image = Image.open(uploaded_file)
     buffered = BytesIO()
     image.save(buffered, format="JPEG")
@@ -201,6 +200,7 @@ def main():
         for uploaded_file in uploaded_files:
             try:
                 # Classify the image
+                images.append(uploaded_file)
                 label = predict(uploaded_file, api_url, token)
                 
                 # Insert the label into labels
@@ -216,8 +216,8 @@ def main():
                     labels.append(None)
                 statuses.append(False)
 
-        display_result(images, labels, statuses)
         display_stats(labels)
+        display_result(images, labels, statuses)
 
 if __name__ == "__main__":
     main()
