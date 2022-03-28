@@ -101,7 +101,7 @@ def display_result(images, labels, statuses, datetimes):
             
             # Display filename
             with col3:
-                st.write(image[1])
+                st.caption(image[1])
                 
             with col4:
                 st.write(status_label[status])
@@ -193,6 +193,7 @@ def predict(uploaded_file, uuid_str, api_url, token):
     prediction = requests.request("POST", pred_url, 
                                   headers=headers, data=data)
 
+    print(prediction.text)
     # Parse the prediction
     label = ast.literal_eval(prediction.text)[0]
     return label
