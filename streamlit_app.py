@@ -1,9 +1,11 @@
 import ast
+import uuid
 import json
 import base64
 import logging
 import zipfile
 from io import BytesIO
+from datetime import datetime
 from collections import Counter
 
 import requests
@@ -58,29 +60,54 @@ def download_data_sample(api_url, token):
     except Exception as e:
         logging.error(e)
 
-def display_result(images, labels, statuses):
+def display_result(images, labels, statuses, datetimes):
     status_label = {
         True: "Success",
         False: "Failed",
     }
-    for (image, label, status) in zip(images, labels, statuses):
+    with st.container():
+        col1, col2, col3, col4, col5 = st.columns(1, 2, 1, 1, 1)
+
+        with col1:
+            st.write("Time")
+        
+        with col2:
+            st.write("Input")
+        
+        with col3:
+            st.write("Filename")
+        
+        with col4:
+            st.write("Request Status")
+        
+        with col5:
+            st.write("Result")
+    
+    for (image, label, status, date_time) in zip(images, labels, statuses, datetimes):
         # Display prediction details
         with st.container():
-            col1, col2, col3 = st.columns(3)
+            col1, col2, col3, col4, col5 = st.columns(1, 2, 1, 1, 1)
 
-            # Display the image with filename as caption
+            # Display datetime
             with col1:
+                st.write(date_time)
+
+            # Display the image
+            with col2:
                 st.image(
                     image[0], 
-                    caption=image[1], 
                     use_column_width=False,
                 )
-
-            with col2:
-                st.write("Status: {}".format(status_label[status]))
-                
+            
+            # Display filename
             with col3:
-                st.write("Label: {}".format(label))
+                st.write(image[1])
+                
+            with col4:
+                st.write(status_label[status])
+                
+            with col5:
+                st.write(label)
 
 def display_pie_chart(sizes, labels):
     data = [{"value": sizes[i], "name": labels[i]} for i in range(len(sizes))]
@@ -140,13 +167,17 @@ def display_stats(labels):
         with col2:
             display_bar_chart(freqs, unique_labels)
 
-def predict(uploaded_file, api_url, token):
+def predict(uploaded_file, uuid_str, api_url, token):
     # Prepare the uploaded image into base64 encoded string
     image = Image.open(uploaded_file)
     buffered = BytesIO()
     image.save(buffered, format="JPEG")
     encoded_string = base64.b64encode(buffered.getvalue())
-    data = json.dumps({"data": encoded_string.decode('utf-8')})
+    data = json.dumps({
+        "data": encoded_string.decode('utf-8'),
+        "uuid": uuid_str,
+        "version": "mostrecent"
+    })
 
     # Set the path for prediction API
     pred_url = api_url + "/prod/m"
@@ -190,6 +221,8 @@ def main():
     labels = []
     statuses = []
     images = []
+    uuids = []
+    datetimes = []
 
     st.header("Flower Image Classification")
     
@@ -267,8 +300,17 @@ label = predict(data, api_url, token)
                 # Keep the resized image and filename for prediction display
                 images.append(transform_image(uploaded_file))
                 
+                # Create identifier for this prediction
+                uuid_str = uuid.uuid4()
+                uuids.append(uuid_str)
+                
+                # Capture the timestamp of prediction
+                now = datetime.now()
+                date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+                datetimes.append(date_time)
+
                 # Classify the image
-                label = predict(uploaded_file, api_url, token)
+                label = predict(uploaded_file, uuid_str, api_url, token)
                 
                 # Insert the label into labels
                 labels.append(label)
@@ -285,7 +327,7 @@ label = predict(data, api_url, token)
 
         metric_placeholder.metric(label="Request count", value=len(statuses))
         display_stats(labels)
-        display_result(images, labels, statuses)
+        display_result(images, labels, statuses, datetimes)
 
 if __name__ == "__main__":
     main()
