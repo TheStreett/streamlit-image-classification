@@ -66,7 +66,7 @@ def display_result(images, labels, statuses, datetimes):
         False: "Failed",
     }
     with st.container():
-        col1, col2, col3, col4, col5 = st.columns(1, 2, 1, 1, 1)
+        col1, col2, col3, col4, col5 = st.columns([1, 2, 1, 1, 1])
 
         with col1:
             st.write("Time")
@@ -86,7 +86,7 @@ def display_result(images, labels, statuses, datetimes):
     for (image, label, status, date_time) in zip(images, labels, statuses, datetimes):
         # Display prediction details
         with st.container():
-            col1, col2, col3, col4, col5 = st.columns(1, 2, 1, 1, 1)
+            col1, col2, col3, col4, col5 = st.columns([1, 2, 1, 1, 1])
 
             # Display datetime
             with col1:
