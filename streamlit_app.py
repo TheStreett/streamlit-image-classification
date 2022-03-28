@@ -111,7 +111,7 @@ def display_result(images, labels, statuses, datetimes, uuids):
     data_frame = pd.DataFrame()
     data_frame = data_frame.assign(result=labels)
     data_frame = data_frame.assign(status=[status_label[x] for x in statuses])
-    data_frame = data_frame.assign(filename=[x[1] for x in image])
+    data_frame = data_frame.assign(filename=[x[1] for x in images])
     data_frame = data_frame.assign(unique_id=uuids)
     data_frame = data_frame.assign(time=datetimes)
 
