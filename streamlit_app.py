@@ -297,7 +297,7 @@ label = predict(data, api_url, token)
         st.code(code, "python")
 
     with st.container():
-        col1, col2 = st.columns([3, 1])
+        col1, col2 = st.columns([3, 2])
 
         with col1:
             uploaded_files = st.file_uploader(
