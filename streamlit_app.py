@@ -256,10 +256,10 @@ def main():
         st.write("To build and run modelshare's streamlit app, you will need "
                   "authorization token and modelshare's playground URL. "
                   "You can obtain the auth token by signing in to www.modelshare.org "
-                  "and the playground URL by choosing any of available playground in "
-                  "www.modelshare.org. Pass the auth token to the app as a query "
-                  "parameter 'token' on streamlit's URL, e.g. https://share.streamlit.io/user/"
-                  "apps-name/main?token=secret.")
+                  "and the playground URL by choosing any available playground in "
+                  "www.modelshare.org. Use the sample code below and pass the auth token to the "
+                  "app as a query parameter 'token' on streamlit's URL, e.g. "
+                  "https://share.streamlit.io/user/apps-name/main?token=secret.")
 
         st.write("Here are some important part of codes to classify an image"
                  " using modelshare's playground url")
