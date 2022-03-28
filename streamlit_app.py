@@ -302,7 +302,7 @@ label = predict(data, api_url, token)
                 images.append(transform_image(uploaded_file))
                 
                 # Create identifier for this prediction
-                uuid_str = uuid.uuid4()
+                uuid_str = str(uuid.uuid4())
                 uuids.append(uuid_str)
                 
                 # Capture the timestamp of prediction
