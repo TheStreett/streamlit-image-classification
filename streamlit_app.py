@@ -9,11 +9,9 @@ from datetime import datetime
 from collections import Counter
 
 import requests
+import pandas as pd
 from PIL import Image
 import streamlit as st
-import plotly.express as px
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
 from streamlit_echarts import st_echarts
 
 def download_data_sample(api_url, token):
@@ -60,7 +58,7 @@ def download_data_sample(api_url, token):
     except Exception as e:
         logging.error(e)
 
-def display_result(images, labels, statuses, datetimes):
+def display_result(images, labels, statuses, datetimes, uuids):
     status_label = {
         True: "Success",
         False: "Failed",
@@ -108,6 +106,25 @@ def display_result(images, labels, statuses, datetimes):
                 
             with col5:
                 st.write(label)
+
+    # Create dataframe
+    data_frame = pd.DataFrame()
+    data_frame = data_frame.assign(result=labels)
+    data_frame = data_frame.assign(status=[status_label[x] for x in statuses])
+    data_frame = data_frame.assign(filename=[x[1] for x in image])
+    data_frame = data_frame.assign(unique_id=uuids)
+    data_frame = data_frame.assign(time=datetimes)
+
+    # Prepare the data sample in csv
+    csv_data = data_frame.to_csv(index=False).encode('utf-8')
+
+    # Setup a download button
+    st.download_button(
+        label="Download result",
+        data=csv_data,
+        file_name="export.csv",
+        mime="text/csv"
+    )
 
 def display_pie_chart(sizes, labels):
     data = [{"value": sizes[i], "name": labels[i]} for i in range(len(sizes))]
@@ -328,7 +345,7 @@ label = predict(data, api_url, token)
 
         metric_placeholder.metric(label="Request count", value=len(statuses))
         display_stats(labels)
-        display_result(images, labels, statuses, datetimes)
+        display_result(images, labels, statuses, datetimes, uuids)
 
 if __name__ == "__main__":
     main()
