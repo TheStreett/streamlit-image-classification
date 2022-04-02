@@ -238,13 +238,13 @@ def main():
     st.header("Flower Image Classification")
     
     with st.expander("Show developer instruction"):
-        st.markdown("### Guide to build a streamlit app with modelshare's API.")
-        st.markdown("What you need:"
+        st.markdown("#### Guide to build a streamlit app with modelshare's API.")
+        st.markdown("What you'll need: \n"
                     "- auth_token: modelshare's user authorization "
                     "token. It can be retrieved after signing in to "
                     "www.modelshare.org \n"
                     "- playground_url: API endpoint url from any modelshare's"
-                    " playground to do prediction. \n")
+                    " playground to do prediction. \n\n")
         
         st.markdown("Use the sample code below and pass the auth_token "
                     "as a query parameter 'token' on streamlit's URL, e.g. "
