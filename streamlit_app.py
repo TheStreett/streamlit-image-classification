@@ -58,62 +58,35 @@ def download_data_sample(api_url, token):
     except Exception as e:
         logging.error(e)
 
+# Converting photos to html tags
+def path_to_image_html(photo):
+    return '<img src="'+ photo + '" width="60" >'
+
+def image_base64(im):
+    with BytesIO() as buffer:
+        im.save(buffer, 'jpeg')
+        return base64.b64encode(buffer.getvalue()).decode()
+
+def image_formatter(im):
+    return f'<img src="data:image/jpeg;base64,{image_base64(im)}">'
+
 def display_result(images, labels, statuses, datetimes, uuids):
     status_label = {
         True: "Success",
         False: "Failed",
     }
-    with st.container():
-        col1, col2, col3, col4, col5 = st.columns([1, 2, 1, 1, 1])
-
-        with col1:
-            st.write("Time")
-        
-        with col2:
-            st.write("Input")
-        
-        with col3:
-            st.write("Filename")
-        
-        with col4:
-            st.write("Request Status")
-        
-        with col5:
-            st.write("Result")
-    
-    for (image, label, status, date_time) in zip(images, labels, statuses, datetimes):
-        # Display prediction details
-        with st.container():
-            col1, col2, col3, col4, col5 = st.columns([1, 2, 1, 1, 1])
-
-            # Display datetime
-            with col1:
-                st.write(date_time)
-
-            # Display the image
-            with col2:
-                st.image(
-                    image[0], 
-                    use_column_width=False,
-                )
-            
-            # Display filename
-            with col3:
-                st.caption(image[1])
-                
-            with col4:
-                st.write(status_label[status])
-                
-            with col5:
-                st.write(label)
-
     # Create dataframe
     data_frame = pd.DataFrame()
-    data_frame = data_frame.assign(result=labels)
-    data_frame = data_frame.assign(status=[status_label[x] for x in statuses])
-    data_frame = data_frame.assign(filename=[x[1] for x in images])
-    data_frame = data_frame.assign(unique_id=uuids)
     data_frame = data_frame.assign(time=datetimes)
+    data_frame = data_frame.assign(input=[x[0] for x in images])
+    data_frame = data_frame.assign(filename=[x[1] for x in images])
+    data_frame = data_frame.assign(status=[status_label[x] for x in statuses])
+    data_frame = data_frame.assign(result=labels)
+    
+    st.table(data_frame.to_html(escape=False, formatters={'input': image_formatter}))
+
+    data_frame = data_frame.drop(['input'])
+    data_frame = data_frame.assign(unique_id=uuids)
 
     # Prepare the data sample in csv
     csv_data = data_frame.to_csv(index=False).encode('utf-8')
