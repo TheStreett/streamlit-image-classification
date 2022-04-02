@@ -83,9 +83,12 @@ def display_result(images, labels, statuses, datetimes, uuids):
     data_frame = data_frame.assign(status=[status_label[x] for x in statuses])
     data_frame = data_frame.assign(result=labels)
     
-    st.write(data_frame.to_html(escape=False, formatters={'input': image_formatter}))
+    st.write(
+        data_frame.to_html(escape=False, formatters={'input': image_formatter}),
+        unsafe_allow_html=True
+    )
 
-    print(data_frame.head())
+    logging.warning(data_frame.head())
     data_frame = data_frame.drop(['input'])
     data_frame = data_frame.assign(unique_id=uuids)
 
