@@ -88,7 +88,7 @@ def display_result(images, labels, statuses, datetimes, uuids):
         unsafe_allow_html=True
     )
 
-    logging.warning(data_frame.head())
+    logging.warning(data_frame.columns)
     data_frame = data_frame.drop(['input'])
     data_frame = data_frame.assign(unique_id=uuids)
 
