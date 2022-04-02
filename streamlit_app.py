@@ -237,7 +237,7 @@ def main():
 
     st.header("Flower Image Classification")
     
-    with st.expander("Show developer instruction"):
+    with st.expander("Show developer's guide"):
         st.markdown("#### Guide to build a streamlit app with modelshare's API.")
         st.markdown("What you'll need: \n"
                     "- auth_token: modelshare's user authorization "
