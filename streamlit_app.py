@@ -246,7 +246,7 @@ def main():
                     "- playground_url: API endpoint url from any modelshare's"
                     " playground to do prediction. \n\n")
         
-        st.markdown("Use the sample code below and pass the auth_token "
+        st.write("Use the sample code below and pass the auth_token "
                     "as a query parameter 'token' on streamlit's URL, e.g. "
                     "https://share.streamlit.io/user/apps-name/main?token=secret.")
 
