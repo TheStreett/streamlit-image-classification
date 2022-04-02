@@ -53,7 +53,8 @@ def download_data_sample(api_url, token):
             label="Download data sample",
             data=zip_buffer.getvalue(),
             file_name="data_sample.zip",
-            mime="application/zip"
+            mime="application/zip",
+            help="Download in-built example file to demo the app"
         )
     except Exception as e:
         logging.error(e)
@@ -236,16 +237,20 @@ def main():
 
     st.header("Flower Image Classification")
     
-    with st.expander("Show instruction"):
-        st.write("To build and run modelshare's streamlit app, you will need "
-                  "authorization token and modelshare's playground URL. "
-                  "You can obtain the auth token by signing in to www.modelshare.org "
-                  "and the playground URL by choosing any available playground in "
-                  "www.modelshare.org. Use the sample code below and pass the auth token to the "
-                  "app as a query parameter 'token' on streamlit's URL, e.g. "
-                  "https://share.streamlit.io/user/apps-name/main?token=secret.")
+    with st.expander("Show developer instruction"):
+        st.markdown("##Guide to build a streamlit app with modelshare's API.")
+        st.markdown("What you need:\n"
+                    "- authorization_token: modelshare's user authorization "
+                    "token. It can be retrieved after signing in to "
+                    "www.modelshare.org \n"
+                    "- playground_url: API endpoint url from any modelshare's"
+                    " playground to do prediction.")
+        
+        st.markdown("Use the sample code below and pass the auth token "
+                    "as a query parameter 'token' on streamlit's URL, e.g. "
+                    "https://share.streamlit.io/user/apps-name/main?token=secret.")
 
-        st.write("Here are some important part of codes to classify an image"
+        st.write("Here is a sample code to run a prediction of an image"
                  " using modelshare's playground url")
 
         code = """
