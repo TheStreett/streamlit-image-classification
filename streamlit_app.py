@@ -75,6 +75,14 @@ def display_result(images, labels, statuses, datetimes, uuids):
         True: "Success",
         False: "Failed",
     }
+
+    # Made it this way to uniquely set the css without border
+    with st.container():
+        with st.container():
+            _, col2 = st.columns([7, 2])
+            with col2:
+                dl_button = st.empty()
+   
     # Create dataframe
     data_frame = pd.DataFrame()
     data_frame = data_frame.assign(time=datetimes)
@@ -95,7 +103,7 @@ def display_result(images, labels, statuses, datetimes, uuids):
     csv_data = data_frame.to_csv(index=False).encode('utf-8')
 
     # Setup a download button
-    st.download_button(
+    dl_button.download_button(
         label="Download result",
         data=csv_data,
         file_name="export.csv",
