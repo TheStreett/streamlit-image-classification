@@ -85,6 +85,7 @@ def display_result(images, labels, statuses, datetimes, uuids):
     
     st.write(data_frame.to_html(escape=False, formatters={'input': image_formatter}))
 
+    data_frame.head()
     data_frame = data_frame.drop(['input'])
     data_frame = data_frame.assign(unique_id=uuids)
 
