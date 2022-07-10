@@ -14,6 +14,7 @@ from PIL import Image
 import streamlit as st
 from streamlit_echarts import st_echarts
 
+
 def download_data_sample(playground_url, auth_token):
     try:
         # Set the path for eval API
@@ -217,7 +218,7 @@ def main():
     local_css("style.css")
 
     # Set the API url accordingly based on AIModelShare Playground API.
-    playground_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com"
+    playground_url = "https://hwuryj604h.execute-api.us-east-1.amazonaws.com"
 
     # Get the query parameter
     params = st.experimental_get_query_params()
@@ -262,7 +263,7 @@ from PIL import Image
 import streamlit as st
 from io import BytesIO
 
-playground_url = "https://5l7clbsyu5.execute-api.us-east-1.amazonaws.com"
+playground_url = "https://hwuryj604h.execute-api.us-east-1.amazonaws.com"
 auth_token = st.experimental_get_query_params()['token'][0]
 image = Image.open(image_file)
 def predict(image, playground_url, auth_token):
