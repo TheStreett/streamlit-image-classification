@@ -224,9 +224,10 @@ def main():
     # Get the query parameter
     params = st.experimental_get_query_params()
     if "token" not in params:
-        st.warning("Please insert the auth token as query parameter. "
-                   "Access the app through modelshare.org to do so auomatically."
-                   "Developer note: e.g. https://share.streamlit.io/username/"
+        st.warning("Please insert the auth token as query parameter. \n "
+                   "Access the app through modelshare.org to do so auomatically. \n"
+                   "Developer note -- auth token follows this format: \n"
+                   "https://share.streamlit.io/username/"
                    "streamlit-image-classification/main?token=secret")
         auth_token = ""
     else:
