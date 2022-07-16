@@ -218,13 +218,15 @@ def main():
     local_css("style.css")
 
     # Set the API url accordingly based on AIModelShare Playground API.
+    # Note that the API url should end with ".amazonaws.com" 
     playground_url = "https://hwuryj604h.execute-api.us-east-1.amazonaws.com"
 
     # Get the query parameter
     params = st.experimental_get_query_params()
     if "token" not in params:
-        st.warning("Please insert the auth token as query parameter. " 
-                   "e.g. https://share.streamlit.io/raudipra/"
+        st.warning("Please insert the auth token as query parameter. "
+                   "Access the app through modelshare.org to do so auomatically."
+                   "Developer note: e.g. https://share.streamlit.io/username/"
                    "streamlit-image-classification/main?token=secret")
         auth_token = ""
     else:
@@ -242,7 +244,8 @@ def main():
         st.markdown("#### Guide to build a streamlit app with modelshare's API.")
         st.markdown("What you'll need: \n"
                     "- auth_token: modelshare's user authorization "
-                    "token. It can be retrieved after signing in to "
+                    "token. It can be retrieved from your Model Playground page"
+                    "after signing in to "
                     "www.modelshare.org \n"
                     "- playground_url: API endpoint url from any modelshare's"
                     " playground to do prediction. \n\n")
